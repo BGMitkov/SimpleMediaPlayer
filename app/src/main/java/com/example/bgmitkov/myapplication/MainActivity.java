@@ -1,6 +1,7 @@
 package com.example.bgmitkov.myapplication;
 
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -19,6 +20,7 @@ import android.widget.ListView;
 public class MainActivity extends AppCompatActivity {
 
     ListView listView = null;
+    MediaPlayer mediaPlayer = null;
     private static final int INTERNAL_STORAGE_MUSIC_LOADER_ID = 1;
     private static final int EXTERNAL_STORAGE_MUSIC_LOADER_ID = 2;
 
@@ -30,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     private LoaderManager.LoaderCallbacks<Cursor> internalStorageMusicLoader = null;
 
 
-    //TextView resultView = null;
     CursorLoader cursorLoader = null;
     CursorAdapter cursorAdapter = null;
 
@@ -38,13 +39,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         setContentView(R.layout.activity_main);
-        listView = (ListView) findViewById(R.id._musicList);
+        mediaPlayer = new MediaPlayer();
+        listView = (ListView) findViewById(R.id._list_view);
         ContentLoadingProgressBar progressBar = new ContentLoadingProgressBar(this);
         progressBar.setLayoutParams(new DrawerLayout.LayoutParams(DrawerLayout.LayoutParams.WRAP_CONTENT,
                 DrawerLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
         progressBar.setIndeterminate(true);
-        listView.setEmptyView(progressBar);
+        //listView.setEmptyView(progressBar);
 
         ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
         root.addView(progressBar);
@@ -54,12 +57,14 @@ public class MainActivity extends AppCompatActivity {
 
         cursorAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, null, fromColumns, toViews, 0);
         boolean externalStorage = isExternalStorageReadable();
+
        // externalStorage = false;
         internalStorageMusicLoader = new LocalStorageMusicLoader(this, MediaStore.Audio.Media.INTERNAL_CONTENT_URI, PROJECTION,SELECTION, cursorAdapter);
         externalStorageMusicLoader = externalStorage?new LocalStorageMusicLoader(this,  MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, PROJECTION,SELECTION, cursorAdapter):null;
 
         listView.setAdapter(cursorAdapter);
-
+        listView.setOnItemClickListener(new OnItemClickListener(mediaPlayer));
+        mediaPlayer.setOnErrorListener(new OnErrorListener());
         //resultView = (TextView) findViewById(R.id._music);
 
         LoaderManager loaderManager = getSupportLoaderManager();
@@ -67,9 +72,9 @@ public class MainActivity extends AppCompatActivity {
         if(externalStorage) loaderManager.initLoader(EXTERNAL_STORAGE_MUSIC_LOADER_ID, null, externalStorageMusicLoader);
     }
 
-    /*public void _get_music(View view) {
-        getSupportLoaderManager().initLoader(1, null, this);
-    }*/
+    public void _play_music(ListView view) {
+
+    }
 
     /*@Override
     public android.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
