@@ -27,5 +27,12 @@
         android:ems="10" >
         </ListView>
 
+    <!--<android.support.v4.widget.ContentLoadingProgressBarr
+        android:id="@+id/indeterminateBar"
+        style="@android:style/Widget.ProgressBar.Inverse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="gravity."
+        />-->
 
 </LinearLayout>
