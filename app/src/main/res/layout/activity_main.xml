@@ -35,7 +35,7 @@
             android:id="@+id/_settings_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="_start_setting_activity"
+            android:onClick="_start_settings_activity"
             android:text="@string/settings_button_text"
             style="?android:buttonBarButtonStyle"/>
     </LinearLayout>

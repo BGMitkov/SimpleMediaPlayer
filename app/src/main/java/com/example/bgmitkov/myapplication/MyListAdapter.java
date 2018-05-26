@@ -19,7 +19,6 @@ import java.util.List;
 final class MyListAdapter extends CursorAdapter {
     public MyListAdapter(Context context, Cursor c) {
         super(context, c, 0);
-
     }
 
     @Override

@@ -5,4 +5,6 @@
     <string name="running_song_holder_text">No Song running!</string>
     <string name="title_activity_settings">Settings</string>
     <string name="settings_button_text">Settings</string>
+    <string name="preference_file_key">com.example.bgmitkov.myapplication.PREFERENCE_FILE_KEY</string>
+
 </resources>

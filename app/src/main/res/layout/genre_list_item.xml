@@ -4,14 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="?attr/listPreferredItemHeight">
-    <TextView  android:id="@+id/_display_name"
+
+    <CheckBox
+        android:id="@+id/_genre_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="CheckBox"
+        android:onClick="genre_click"
         android:textAppearance="?attr/textAppearanceListItem"/>
-
-    <TextView android:id="@+id/_file_path"
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"/>
-
 </LinearLayout>
