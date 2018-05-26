@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,28 +10,60 @@
     android:orientation="vertical"
     tools:context="com.example.bgmitkov.myapplication.MainActivity">
 
-  <!--  <Button
-        android:id="@+id/_btn_get_music"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:onClick="_get_music"
-        android:text="Display Music" />-->
-
-    <ListView
-        android:id="@+id/_list_view"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:clickable="true"
-        android:ems="10" >
-        </ListView>
+        android:orientation="horizontal"
+        style="?android:buttonBarButtonStyle">
+        <Button
+            android:id="@+id/_btn_get_songs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="_get_songs"
+            android:text="@string/load_button_text"
+            style="?android:buttonBarButtonStyle"/>
 
-    <!--<android.support.v4.widget.ContentLoadingProgressBarr
-        android:id="@+id/indeterminateBar"
-        style="@android:style/Widget.ProgressBar.Inverse"
-        android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/_download_songs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="_download_songs"
+            android:text="@string/download_button"
+            style="?android:buttonBarButtonStyle"/>
+
+        <Button
+            android:id="@+id/_settings_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="_start_setting_activity"
+            android:text="@string/settings_button_text"
+            style="?android:buttonBarButtonStyle"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="gravity."
-        />-->
+        android:layout_weight="1">
+        <ListView
+            android:id="@+id/_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:smoothScrollbar="true"
+            >
+        </ListView>
+    </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/running_song_holder_text"
+
+            />
+    </LinearLayout>
 </LinearLayout>

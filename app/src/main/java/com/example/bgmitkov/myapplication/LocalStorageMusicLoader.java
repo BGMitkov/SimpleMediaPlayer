@@ -38,6 +38,7 @@ final class LocalStorageMusicLoader implements LoaderManager.LoaderCallbacks<Cur
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         cursorAdapter.swapCursor(data);
+
     }
 
     @Override

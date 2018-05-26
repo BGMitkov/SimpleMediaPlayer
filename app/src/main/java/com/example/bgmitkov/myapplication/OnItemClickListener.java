@@ -1,5 +1,9 @@
 package com.example.bgmitkov.myapplication;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
 import android.view.View;
@@ -26,14 +30,14 @@ final class OnItemClickListener implements AdapterView.OnItemClickListener {
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         mediaPlayer.reset();
         ListView listView = mediaPlayer.getListView();
-        int p = mediaPlayer.getLastPosition();
+        int lastPosition = mediaPlayer.getLastPosition();
 
-        View lastItem = (View) listView.getChildAt(p);
+        View lastItem = listView.getChildAt(lastPosition);
         if(lastItem != null) {
             TextView text = (TextView) lastItem.findViewById(R.id._display_name);
             text.setTextColor(Color.BLACK);
 
-            System.out.println("Previous song at " + p + " was : " + text.getText().toString());
+            System.out.println("Previous song at " + lastPosition + " was : " + text.getText().toString());
         }
 
         System.out.println("Position of playing song : " + position);
@@ -42,21 +46,23 @@ final class OnItemClickListener implements AdapterView.OnItemClickListener {
         TextView path = (TextView) view.findViewById(R.id._file_path);
         String filePath = path.getText().toString();
         File file = new File(filePath);
+
+        if(!file.exists()) {
+            new AlertDialog.Builder(listView.getContext()).setMessage("Song file is missing!").show();
+            return;
+        }
         System.out.println(filePath);
 
         TextView name = (TextView) view.findViewById(R.id._display_name);
-
-        /*ImageView image = item.getImage();
-        image.setVisibility(View.VISIBLE);
-        image.setImageResource(R.drawable.volume_up);
-        image.setBackgroundResource(R.drawable.volume_up);*/
         Uri myUri = Uri.fromFile(file);
+        TextView runningSongHolder = mediaPlayer.getTextView();
         try{
             mediaPlayer.setDataSource(parent.getContext(), myUri);
             mediaPlayer.prepare();
             mediaPlayer.start();
-            name.setTextColor(Color.GREEN);
+            runningSongHolder.setText(name.getText().toString());
             mediaPlayer.setLastPosition(position);
+            mediaPlayer.seekTo(mediaPlayer.getDuration() - 5000);
         } catch (IOException e) {
             System.out.println(filePath);
             e.printStackTrace();
