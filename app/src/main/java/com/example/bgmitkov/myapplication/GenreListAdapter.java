@@ -32,7 +32,8 @@ public class GenreListAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         CheckBox checkBox = (CheckBox) view.findViewById(R.id._genre_name);
         TextView tvID = (TextView)  view.findViewById(R.id._genre_id);
-        String name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME));
+        String name = "ID-" + cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Genres._ID)) + " / " +
+                cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME));
         String id = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Genres._ID));
         SharedPreferences prefs = context.getSharedPreferences("genre_selection", Context.MODE_PRIVATE);
         checkBox.setText(name);
