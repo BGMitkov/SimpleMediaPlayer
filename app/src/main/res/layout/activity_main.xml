@@ -48,7 +48,6 @@
             android:id="@+id/_list_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:clickable="true"
             android:smoothScrollbar="true"
             >

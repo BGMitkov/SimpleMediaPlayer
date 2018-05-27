@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.provider.MediaStore;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,12 +18,15 @@ import java.util.List;
  */
 
 final class MyListAdapter extends CursorAdapter {
+    public static final String TAG = "MainActivity";
+
     public MyListAdapter(Context context, Cursor c) {
         super(context, c, 0);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        Log.d(TAG, "newView");
         return LayoutInflater.from(context).inflate(R.layout.list_item,parent,false);
     }
 
@@ -31,12 +35,13 @@ final class MyListAdapter extends CursorAdapter {
         TextView tvName = (TextView) view.findViewById(R.id._display_name);
         TextView tvPath = (TextView) view.findViewById(R.id._file_path);
 
-        String name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
-        String path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
+        String name = "ID-" + cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.Members.GENRE_ID)) + " / " +
+                cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.Members.DISPLAY_NAME));
+        String path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.Members.DATA));
 
         tvName.setText(name);
         tvPath.setText(path);
-
+        Log.d(TAG, "bindView: " + name + " at " + path);
     }
 
     /*@Override

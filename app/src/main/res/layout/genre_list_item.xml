@@ -14,6 +14,7 @@
         android:onClick="genre_click"
         android:textAppearance="?attr/textAppearanceListItem"/>
     <TextView
+        android:id="@+id/_genre_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"/>

@@ -1,5 +1,7 @@
 package com.example.bgmitkov.myapplication;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 
@@ -14,6 +16,8 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ListView;
 
+import java.util.List;
+
 public class Settings extends AppCompatActivity {
 
     private static final String TAG = "Settings";
@@ -21,7 +25,7 @@ public class Settings extends AppCompatActivity {
     private GenreListAdapter genreListAdapter;
     private LoaderManager.LoaderCallbacks<Cursor> externalStorageGenreLoader = null;
 
-    private static final int EXTERNAL_STORAGE_GENRE_LOADER_ID = 4;
+    private static final int EXTERNAL_STORAGE_GENRE_LOADER_ID = 2;
     static final String[] PROJECTION = new String[]{
             Genres._ID,
             Genres.NAME,
@@ -33,15 +37,13 @@ public class Settings extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        settings = (ListView) findViewById(R.id._genre_list_view);
 
         genreListAdapter = new GenreListAdapter(this, null);
-
         externalStorageGenreLoader = isExternalStorageReadable()?new LocalStorageMusicLoader(getApplicationContext(), Genres.getContentUri("external"), PROJECTION,SELECTION, genreListAdapter):null;
-
-        settings = (ListView) findViewById(R.id._genre_list_view);
         settings.setAdapter(genreListAdapter);
-
         LoaderManager loaderManager = getSupportLoaderManager();
+
         if(isExternalStorageReadable()) loaderManager.initLoader(EXTERNAL_STORAGE_GENRE_LOADER_ID, null, externalStorageGenreLoader);
     }
 
@@ -56,10 +58,10 @@ public class Settings extends AppCompatActivity {
 
     public void genre_click(View view) {
         CheckBox checkBox = (CheckBox) view;
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = getApplicationContext().getSharedPreferences("genre_selection", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         String name = checkBox.getText().toString();
         editor.putBoolean(name, checkBox.isChecked());
-        Log.d(TAG, "genre_click: genre " + name + " is set to " + checkBox.isChecked());
+        editor.apply();
     }
 }
