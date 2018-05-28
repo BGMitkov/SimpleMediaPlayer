@@ -26,7 +26,7 @@ final class MyListAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        Log.d(TAG, "newView");
+        /*Log.d(TAG, "newView");*/
         return LayoutInflater.from(context).inflate(R.layout.list_item,parent,false);
     }
 
@@ -41,7 +41,7 @@ final class MyListAdapter extends CursorAdapter {
 
         tvName.setText(name);
         tvPath.setText(path);
-        Log.d(TAG, "bindView: " + name + " at " + path);
+        /*Log.d(TAG, "bindView: " + name + " at " + path);*/
     }
 
     /*@Override

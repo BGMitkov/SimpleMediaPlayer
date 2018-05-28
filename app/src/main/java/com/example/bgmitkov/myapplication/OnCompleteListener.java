@@ -22,6 +22,7 @@ public class OnCompleteListener implements MediaPlayer.OnCompletionListener {
         ListView listView = mmp.getListView();
         int lastPosition = mmp.getLastPosition();
         ListAdapter listAdapter = listView.getAdapter();
+
         File file;
         View nextView;
         String filePath;
