@@ -5,4 +5,8 @@
         android:id="@+id/action_settings"
         android:title="@string/action_settings"
         app:showAsAction="never"/>
+    <item android:id="@+id/action_download_songs"
+        android:title="@string/action_download_songs"
+        android:icon="@drawable/ic_action_download_activity"
+        app:showAsAction="ifRoom"/>
 </menu>

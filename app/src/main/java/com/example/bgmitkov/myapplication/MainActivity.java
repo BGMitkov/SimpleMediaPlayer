@@ -10,16 +10,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore.Audio.Genres;
 import android.provider.MediaStore.Audio.Genres.Members;
-import android.provider.MediaStore.Audio.Media;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
@@ -31,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final String _LOG_TAG = "=-= MainActivity";
     static final int PICK_GENRES_REQUEST = 1;
-
     static final String[] GENRE_PROJECTION = new String[]{
             Genres._ID,
             Genres.NAME};
@@ -56,33 +52,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public static final String ON_CREATE_LOADER = "onCreateLoader";
     public static final String ON_LOAD_FINISHED = "onLoadFinished";
     public static final String ON_LOADER_RESET = "onLoaderReset()";
-    static String SELECTION;
+    public static final String DOWNLOAD_SONGS_ACTIVITY = "_download_songs_activity";
+    String selection;
     ListView listView;
     MyMediaPlayer mediaPlayer;
     MyListAdapter cursorAdapter;
-    GenreListAdapter genreListAdapter;
-
-    /*static final String[] PROJECTION = new String[]{
-            MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Media.DATA,
-            MediaStore.Audio.Media.DISPLAY_NAME,
-            MediaStore.Audio.Media.MIME_TYPE};
-    static final String SELECTION = "((" + MediaStore.Audio.Media.IS_MUSIC + " != 0) AND" +
-            " (" + MediaStore.Audio.Media.DATA + " LIKE \'%.mp3\'))";*/
     ListView genreList;
-    SharedPreferences prefs;
-    private LoaderManager.LoaderCallbacks<Cursor> externalStorageMusicLoader;
-    private LoaderManager.LoaderCallbacks<Cursor> externalStorageGenreLoader;
+    GenreListAdapter genreListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        log2me(ON_CREATE, CALLED);
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
-        ActionBar ab = getSupportActionBar();
-        ab.show();
-        log2me(ON_CREATE, CALLED);
+
         listView = (ListView) findViewById(R.id._list_view);
         TextView runningSongHolder = (TextView) findViewById(R.id._text_view);
 
@@ -91,8 +76,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         genreList = new ListView(this);
         genreListAdapter = new GenreListAdapter(this, null);
         genreList.setAdapter(genreListAdapter);
-//        externalStorageGenreLoader = isExternalStorageReadable() ? new LocalStorageMusicLoader(getApplicationContext(), Genres.getContentUri("external"), GENRE_PROJECTION, GENRE_SELECTION, genreListAdapter) : null;
-        prefs = getApplicationContext().getSharedPreferences("genre_selection", Context.MODE_PRIVATE);
 
         listView.setOnItemClickListener(new OnItemClickListener(mediaPlayer));
         mediaPlayer.setOnErrorListener(new OnErrorListener());
@@ -113,9 +96,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public void _get_songs() {
         log2me(GET_SONGS, CALLED);
-
-        SELECTION = Members.GENRE_ID + " IN (";
-        StringBuilder sb = new StringBuilder(SELECTION);
+        SharedPreferences prefs = getApplicationContext().getSharedPreferences("genre_selection", Context.MODE_PRIVATE);
+        selection = Members.GENRE_ID + " IN (";
+        StringBuilder sb = new StringBuilder(selection);
         int genresCount = genreListAdapter.getCount();
         log2me(GET_SONGS, "Genres retrieved : " + genresCount);
 
@@ -140,17 +123,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
         sb.append(") AND ").append(Members.IS_MUSIC).append(" != 0 AND ").append(Members.DATA).append(" LIKE \'%.mp3\'");
-        SELECTION = sb.toString();
+        selection = sb.toString();
 
-        log2me("query created : ", SELECTION);
+        log2me("query created : ", selection);
         Uri uri = Uri.parse("content://media/external/audio/genres/all/members");
-        externalStorageMusicLoader = isExternalStorageReadable() ? new LocalStorageMusicLoader(this, uri, PROJECTION, SELECTION, cursorAdapter) : null;
+        LoaderManager.LoaderCallbacks<Cursor> externalStorageMusicLoader = isExternalStorageReadable() ? new LocalStorageMusicLoader(this, uri, PROJECTION, selection, cursorAdapter) : null;
         getSupportLoaderManager().initLoader(EXTERNAL_STORAGE_MUSIC_LOADER_ID, null, externalStorageMusicLoader);
         log2me(GET_SONGS, FINISHED);
     }
 
     public void _download_songs(View view) {
-        new AsyncDownloadSongs(this, listView).execute("http://m.yaht.net/repo/muzic/01-Misunderstood.mp3");
+        new AsyncDownloadSong(this).execute("http://m.yaht.net/repo/muzic/01-Misunderstood.mp3");
+    }
+
+    public void _download_songs_activity() {
+        log2me(DOWNLOAD_SONGS_ACTIVITY, CALLED);
+        Intent downloadSongsIntent = new Intent(this, DownloadMusicActivity.class);
+        startActivity(downloadSongsIntent, null);
+        log2me(DOWNLOAD_SONGS_ACTIVITY, FINISHED);
     }
 
     public void _start_settings_activity() {
@@ -200,10 +190,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         log2me("onDestroy()", CALLED);
     }
 
-    public void log2me(String where, String what) {
-        Log.v(_LOG_TAG + "." + where, what);
-    }
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         log2me(ON_CREATE_LOADER, "id:" + id);
@@ -228,6 +214,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         switch (item.getItemId()) {
             case R.id.action_settings: _start_settings_activity();
                 return true;
+            case R.id.action_download_songs: _download_songs_activity();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -237,5 +225,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
+    }
+
+    public void log2me(String where, String what) {
+        Log.v(_LOG_TAG + "." + where, what);
     }
 }

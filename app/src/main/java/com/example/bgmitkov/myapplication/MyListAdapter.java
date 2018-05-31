@@ -43,20 +43,4 @@ final class MyListAdapter extends CursorAdapter {
         tvPath.setText(path);
         /*Log.d(TAG, "bindView: " + name + " at " + path);*/
     }
-
-    /*@Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View view = convertView;
-        if(view == null) {
-            LayoutInflater vi = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = vi.inflate(R.layout.list_item, parent, null);
-        }
-
-        Item item = (Item) items.get(position);
-
-        if(item != null) {
-
-        }
-
-    }*/
 }

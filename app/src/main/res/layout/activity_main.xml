@@ -16,39 +16,33 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-    <LinearLayout
+    <!--<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         style="?android:buttonBarButtonStyle">
-        <!--<Button
+        &lt;!&ndash;<Button
             android:id="@+id/_btn_get_songs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="_get_songs"
             android:text="@string/load_button_text"
-            style="?android:buttonBarButtonStyle"/>-->
+            style="?android:buttonBarButtonStyle"/>&ndash;&gt;
 
-        <Button
+        &lt;!&ndash;<Button
             android:id="@+id/_download_songs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="_download_songs"
             android:text="@string/download_button"
-            style="?android:buttonBarButtonStyle"/>
+            style="?android:buttonBarButtonStyle"/>&ndash;&gt;
 
-        <!--<Button
-            android:id="@+id/_settings_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="_start_settings_activity"
-            android:text="@string/settings_button_text"
-            style="?android:buttonBarButtonStyle"/>-->
-    </LinearLayout>
+
+    </LinearLayout>-->
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="1">
         <ListView
             android:id="@+id/_list_view"
@@ -56,8 +50,7 @@
             android:layout_height="wrap_content"
             android:clickable="true"
             android:smoothScrollbar="true"
-            >
-        </ListView>
+            />
     </LinearLayout>
 
     <LinearLayout
