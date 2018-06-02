@@ -1,5 +1,6 @@
 package com.example.bgmitkov.myapplication;
 
+import android.app.AlertDialog;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.View;
@@ -20,14 +21,14 @@ public class OnCompleteListener implements MediaPlayer.OnCompletionListener {
         MyMediaPlayer mmp = (MyMediaPlayer) mp;
         mmp.reset();
         ListView listView = mmp.getListView();
-        int lastPosition = mmp.getLastPosition();
         ListAdapter listAdapter = listView.getAdapter();
 
         File file;
         View nextView;
         String filePath;
-        int nextSongPosition = lastPosition;
+        int nextSongPosition = mmp.getLastPosition();
 
+        boolean exists;
         do {
             nextSongPosition += 1;
             if(nextSongPosition >= listAdapter.getCount()) {
@@ -37,12 +38,16 @@ public class OnCompleteListener implements MediaPlayer.OnCompletionListener {
             TextView path = (TextView) nextView.findViewById(R.id._file_path);
             filePath = path.getText().toString();
             file = new File(filePath);
-        } while(!file.exists());
+            exists = file.exists();
+            if(!exists) {
+                new AlertDialog.Builder(listView.getContext()).setMessage("Song file is missing: " + filePath).show();
+            }
+        } while(!exists);
 
         listView.smoothScrollToPositionFromTop(nextSongPosition, 0);
 
         TextView name = (TextView) nextView.findViewById(R.id._display_name);
-        TextView runningSongHolder = mmp.getTextView();
+        TextView runningSongHolder = mmp.getNameHolder();
         Uri myUri = Uri.fromFile(file);
         try{
             mmp.setDataSource(listView.getContext(), myUri);

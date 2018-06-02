@@ -2,16 +2,12 @@ package com.example.bgmitkov.myapplication;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.provider.MediaStore;
 import android.support.v4.widget.CursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import java.util.List;
 
 /**
  * Created by bgmitkov on 22.5.2018 г..
@@ -26,7 +22,6 @@ final class MyListAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        /*Log.d(TAG, "newView");*/
         return LayoutInflater.from(context).inflate(R.layout.list_item,parent,false);
     }
 
@@ -41,6 +36,5 @@ final class MyListAdapter extends CursorAdapter {
 
         tvName.setText(name);
         tvPath.setText(path);
-        /*Log.d(TAG, "bindView: " + name + " at " + path);*/
     }
 }

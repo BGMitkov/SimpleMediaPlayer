@@ -10,6 +10,6 @@
     <string name="action_download_songs">Download Songs</string>
     <string name="example_link">http://m.yaht.net/repo/muzic/</string>
     <string name="_display_songs_button">GET</string>
-
+    <string name="pause_button_text"> |> </string>
 
 </resources>

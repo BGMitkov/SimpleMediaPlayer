@@ -2,14 +2,10 @@ package com.example.bgmitkov.myapplication;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,9 +50,8 @@ final class AsyncDownloadHTML extends AsyncTask<String, Void, List<String>> {
         HttpURLConnection httpURLConnection = null;
         InputStream is = null;
         OutputStream out = null;
-        StringBuilder bs = null;
-        long total = 0;
-        List<String> result = new LinkedList<String>();
+
+        List<String> result = new LinkedList<>();
         if(!params[0].endsWith("/")) {
             address = params[0] + "/";
         } else {
@@ -64,7 +59,6 @@ final class AsyncDownloadHTML extends AsyncTask<String, Void, List<String>> {
         }
 
         try {
-           /* File file = File.createTempFile("song1", ".mp3");*/
             URL url = new URL(address);
             httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setReadTimeout(10000);
@@ -78,20 +72,10 @@ final class AsyncDownloadHTML extends AsyncTask<String, Void, List<String>> {
             }
             log2me(ASYNC_DOWNLOAD_HTML, "Server returned HTTP respond : " + respond);
 
-            //File outputDir = context.getCacheDir();
-            //File.createTempFile("download_website",".html", outputDir);
-            //out = context.openFileOutput("download_website.html", Context.MODE_PRIVATE);
             is = httpURLConnection.getInputStream();
             Scanner scanner = new Scanner(is);
-            //byte[] buffer = new byte[8192];
-            //int len = is.read(buffer);
             while (scanner.hasNext()) {
-                //out.write(buffer, 0, len);
-                //total+=len;
-                //len = is.read(buffer);
                 String line = scanner.nextLine();
-
-
                 if (line.contains(".mp3")) {
                     int lastIndex = 0;
                     int hrefIndex = line.indexOf("href", lastIndex);
@@ -106,7 +90,7 @@ final class AsyncDownloadHTML extends AsyncTask<String, Void, List<String>> {
                     }
                 }
             }
-            //out.flush();
+            scanner.close();
             log2me(ASYNC_DOWNLOAD_HTML, "Website html download finished");
         } catch (MalformedURLException e) {
             log2me(ASYNC_DOWNLOAD_HTML, "URL is invalid");
@@ -136,7 +120,7 @@ final class AsyncDownloadHTML extends AsyncTask<String, Void, List<String>> {
 
     @Override
     protected void onPostExecute(List<String> result) {
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, R.layout.list_item, R.id._display_name, result);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, R.layout.list_item, R.id._display_name, result);
         listView.setAdapter(arrayAdapter);
         progressDialog.setMessage("Found " + result.size() + " songs");
     }

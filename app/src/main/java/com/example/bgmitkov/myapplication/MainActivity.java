@@ -1,5 +1,6 @@
 package com.example.bgmitkov.myapplication;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,10 +20,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
-
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             Members.DISPLAY_NAME,
             Members.MIME_TYPE,
             Members.GENRE_ID};
+    static final Uri uri = Uri.parse("content://media/external/audio/genres/all/members");
     private static final int EXTERNAL_STORAGE_MUSIC_LOADER_ID = 0;
     private static final int EXTERNAL_STORAGE_GENRE_LOADER_ID = 1;
     public static final String ON_START = "onStart";
@@ -53,12 +55,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public static final String ON_LOAD_FINISHED = "onLoadFinished";
     public static final String ON_LOADER_RESET = "onLoaderReset()";
     public static final String DOWNLOAD_SONGS_ACTIVITY = "_download_songs_activity";
-    String selection;
+    public static final int DOWNLOAD_MUSIC_REQUEST_CODE = 2;
+    static MyMediaPlayer mediaPlayer;
+
     ListView listView;
-    MyMediaPlayer mediaPlayer;
     MyListAdapter cursorAdapter;
     ListView genreList;
     GenreListAdapter genreListAdapter;
+    Button pauseButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,35 +74,31 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         listView = (ListView) findViewById(R.id._list_view);
         TextView runningSongHolder = (TextView) findViewById(R.id._text_view);
-
+        pauseButton = (Button) findViewById(R.id._pause_button);
         mediaPlayer = new MyMediaPlayer(listView, runningSongHolder);
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setOnErrorListener(new OnErrorListener());
+        mediaPlayer.setOnCompletionListener(new OnCompleteListener());
+
         genreList = new ListView(this);
         genreListAdapter = new GenreListAdapter(this, null);
         genreList.setAdapter(genreListAdapter);
 
-        listView.setOnItemClickListener(new OnItemClickListener(mediaPlayer));
-        mediaPlayer.setOnErrorListener(new OnErrorListener());
-        mediaPlayer.setOnCompletionListener(new OnCompleteListener());
         cursorAdapter = new MyListAdapter(this, null);
         listView.setAdapter(cursorAdapter);
+        listView.setOnItemClickListener(new OnItemClickListener(mediaPlayer));
+        mediaPlayer.setListView(listView);
 
         getSupportLoaderManager().initLoader(EXTERNAL_STORAGE_GENRE_LOADER_ID, null, this);
 
         log2me(ON_CREATE, FINISHED);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        log2me(ON_START, CALLED);
-    }
-
     public void _get_songs() {
         log2me(GET_SONGS, CALLED);
         SharedPreferences prefs = getApplicationContext().getSharedPreferences("genre_selection", Context.MODE_PRIVATE);
-        selection = Members.GENRE_ID + " IN (";
-        StringBuilder sb = new StringBuilder(selection);
+        StringBuilder selection = new StringBuilder();
+        selection.append(Members.GENRE_ID).append(" IN (");
         int genresCount = genreListAdapter.getCount();
         log2me(GET_SONGS, "Genres retrieved : " + genresCount);
 
@@ -110,42 +110,35 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 String genreName = cbGenre.getText().toString();
                if(prefs.getBoolean(genreName, true)) {
                    String id = ((TextView) genre.findViewById(R.id._genre_id)).getText().toString();
-                   sb.append(id);
-                   sb.append(",");
+                   selection.append(id);
+                   selection.append(",");
                    hasSelection = true;
                }
             }
             if(hasSelection) {
-                sb.deleteCharAt(sb.length() - 1);
+                selection.deleteCharAt(selection.length() - 1);
             }
         } else {
             return;
         }
 
-        sb.append(") AND ").append(Members.IS_MUSIC).append(" != 0 AND ").append(Members.DATA).append(" LIKE \'%.mp3\'");
-        selection = sb.toString();
+        selection.append(") AND ").append(Members.IS_MUSIC).append(" != 0 AND ").append(Members.DATA).append(" LIKE \'%.mp3\'");
+        log2me("query created : ", selection.toString());
 
-        log2me("query created : ", selection);
-        Uri uri = Uri.parse("content://media/external/audio/genres/all/members");
-        LoaderManager.LoaderCallbacks<Cursor> externalStorageMusicLoader = isExternalStorageReadable() ? new LocalStorageMusicLoader(this, uri, PROJECTION, selection, cursorAdapter) : null;
-        getSupportLoaderManager().initLoader(EXTERNAL_STORAGE_MUSIC_LOADER_ID, null, externalStorageMusicLoader);
+        LoaderManager.LoaderCallbacks<Cursor> externalStorageMusicLoader = new LocalStorageMusicLoader(this, uri, PROJECTION, selection.toString(), cursorAdapter);
+        getSupportLoaderManager().restartLoader(EXTERNAL_STORAGE_MUSIC_LOADER_ID, null, externalStorageMusicLoader);
         log2me(GET_SONGS, FINISHED);
-    }
-
-    public void _download_songs(View view) {
-        new AsyncDownloadSong(this).execute("http://m.yaht.net/repo/muzic/01-Misunderstood.mp3");
     }
 
     public void _download_songs_activity() {
         log2me(DOWNLOAD_SONGS_ACTIVITY, CALLED);
         Intent downloadSongsIntent = new Intent(this, DownloadMusicActivity.class);
-        startActivity(downloadSongsIntent, null);
+        startActivityForResult(downloadSongsIntent, DOWNLOAD_MUSIC_REQUEST_CODE);
         log2me(DOWNLOAD_SONGS_ACTIVITY, FINISHED);
     }
 
     public void _start_settings_activity() {
         log2me(START_SETTINGS_ACTIVITY, CALLED);
-        mediaPlayer.reset();
         Intent pickGenresIntent = new Intent(this, Settings.class);
         startActivityForResult(pickGenresIntent, PICK_GENRES_REQUEST);
         log2me(START_SETTINGS_ACTIVITY, FINISHED);
@@ -161,15 +154,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        log2me(ON_ACTIVITY_RESULT, CALLED);
-        if(requestCode == PICK_GENRES_REQUEST) {
-            if(resultCode == RESULT_OK) {
-                super.onActivityResult(requestCode, resultCode, data);
-                mediaPlayer.reset();
-            }
-        }
-        log2me(ON_ACTIVITY_RESULT, FINISHED);
+    protected void onStart() {
+        super.onStart();
+        log2me("onStart()", CALLED);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        log2me("onResume()", CALLED);
     }
 
     @Override
@@ -229,5 +222,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public void log2me(String where, String what) {
         Log.v(_LOG_TAG + "." + where, what);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        log2me(ON_ACTIVITY_RESULT, CALLED + " For requestCode: " + requestCode + " and resultCode: " + resultCode);
+        if(requestCode == PICK_GENRES_REQUEST || requestCode == DOWNLOAD_MUSIC_REQUEST_CODE) {
+            _get_songs();
+        }
+    }
+
+    public void _pause_player(View view) {
+        if(mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            pauseButton.setText(" |> ");
+        } else if(!cursorAdapter.isEmpty()){
+            mediaPlayer.start();
+            pauseButton.setText(" || ");
+        } else {
+            new AlertDialog.Builder(this).setMessage("No music to play").show();
+        }
     }
 }

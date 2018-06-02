@@ -1,16 +1,11 @@
 package com.example.bgmitkov.myapplication;
 
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
-import android.media.MediaDataSource;
-import android.media.MediaDescription;
-import android.media.MediaExtractor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.File;
@@ -22,7 +17,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static android.content.ContentValues.CREATOR;
 import static android.content.ContentValues.TAG;
 
 /**
@@ -45,7 +39,7 @@ final class AsyncDownloadSong extends AsyncTask<String, Integer, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        progressDialog.setMessage("Downloading...");
+        progressDialog.setMessage("Prepping...");
         progressDialog.show();
         progressDialog.setCancelable(true);
     }
@@ -56,11 +50,14 @@ final class AsyncDownloadSong extends AsyncTask<String, Integer, String> {
         HttpURLConnection httpURLConnection = null;
         InputStream is = null;
         OutputStream out = null;
-        StringBuilder bs = null;
         long total = 0;
         String fileName = params[0].substring(params[0].lastIndexOf("/") + 1);
+        File root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
+        file = new File(root, fileName);
+        if(file.exists()) {
+            return "A file with the name: " + fileName + ", already exists in " + root.getAbsolutePath();
+        }
         try {
-           /* File file = File.createTempFile("song1", ".mp3");*/
             URL url = new URL(params[0]);
             httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setReadTimeout(10000);
@@ -72,13 +69,9 @@ final class AsyncDownloadSong extends AsyncTask<String, Integer, String> {
                 return "Server returned HTTP respond : " + respond;
             }
             log2me(ASYNC_DOWNLOAD_SONG, "doInBackground: Server responded with: " + respond);
-            //Log.d(TAG, "doInBackground: Server responded with: " + respond);
             int lengthOfFile = httpURLConnection.getContentLength();
-            //Log.d(TAG, "doInBackground: Length of File" + lengthOfFile);
-            File root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
-            file = new File(root, fileName);
+
             out = new FileOutputStream(file);
-           // out = context.openFileOutput("01-Misunderstood.mp3", Context.MODE_PRIVATE);
             is = httpURLConnection.getInputStream();
             byte[] buffer = new byte[8192];
             int len = is.read(buffer);
@@ -122,17 +115,18 @@ final class AsyncDownloadSong extends AsyncTask<String, Integer, String> {
 
     @Override
     protected void onPostExecute(String s) {
+        if(s.startsWith("A file")) {
+            progressDialog.setMessage(s);
+            return;
+        }
         progressDialog.setMessage("Downloaded " + s + " bytes");
-        //File file = context.getFileStreamPath("01-Misunderstood.mp3");
         String[] paths = new String[] {file.getAbsolutePath()};
         String[] mimeTypes = new String[] {"audio/mpeg"};
         MediaScannerConnection.scanFile(context, paths, mimeTypes, new MediaScannerConnection.OnScanCompletedListener() {
             @Override
             public void onScanCompleted(String path, Uri uri) {
                 log2me(ASYNC_DOWNLOAD_SONG,"onScanCompleted: scanned file on path : " + path);
-                //Log.d(TAG, "onScanCompleted: scanned file on path : " + path);
                 log2me(ASYNC_DOWNLOAD_SONG, "onScanCompleted: scanned file's uri : " + uri);
-                //Log.d(TAG, "onScanCompleted: scanned file's uri : " + uri);
             }
         });
     }

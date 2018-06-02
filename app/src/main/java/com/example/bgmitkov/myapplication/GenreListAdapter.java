@@ -3,10 +3,7 @@ package com.example.bgmitkov.myapplication;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.preference.Preference;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.v4.content.SharedPreferencesCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,9 +37,4 @@ public class GenreListAdapter extends CursorAdapter {
         tvID.setText(id);
         checkBox.setChecked(prefs.getBoolean(name, true));
     }
-
-    /*@Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-    }*/
 }

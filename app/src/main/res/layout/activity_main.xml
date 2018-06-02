@@ -16,52 +16,40 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-    <!--<LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        style="?android:buttonBarButtonStyle">
-        &lt;!&ndash;<Button
-            android:id="@+id/_btn_get_songs"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="_get_songs"
-            android:text="@string/load_button_text"
-            style="?android:buttonBarButtonStyle"/>&ndash;&gt;
 
-        &lt;!&ndash;<Button
-            android:id="@+id/_download_songs"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="_download_songs"
-            android:text="@string/download_button"
-            style="?android:buttonBarButtonStyle"/>&ndash;&gt;
-
-
-    </LinearLayout>-->
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
+
         <ListView
             android:id="@+id/_list_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="true"
-            android:smoothScrollbar="true"
-            />
+            android:smoothScrollbar="true" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
         <TextView
             android:id="@+id/_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/running_song_holder_text"
-
+            android:layout_weight="0.8"
             />
+
+        <Button
+            android:id="@+id/_pause_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="_pause_player"
+            android:text="@string/pause_button_text"
+            style="?android:buttonBarButtonStyle"
+            android:layout_weight="0.2"/>
     </LinearLayout>
 </LinearLayout>
