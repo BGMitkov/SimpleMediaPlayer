@@ -13,7 +13,7 @@ final class OnErrorListener implements MediaPlayer.OnErrorListener {
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
-        Log.d("MainActivity", "WHAT: " + what + " EXTRA: " + extra);
-        return false;
+        Log.e("MainActivity", "WHAT: " + what + " EXTRA: " + extra);
+        return true;
     }
 }

@@ -50,14 +50,15 @@ final class LocalStorageMusicLoader implements LoaderManager.LoaderCallbacks<Cur
         cursorAdapter.swapCursor(data);
         SharedPreferences prefs = context.getSharedPreferences(BackgroundMusicService.PLAYLIST, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-
-        for(int i = 0; i< cursorAdapter.getCount(); i++) {
+        int playlistSize = cursorAdapter.getCount();
+        for(int i = 0; i< playlistSize; i++) {
             TextView songPath = (TextView) cursorAdapter.getView(i,null,null).findViewById(R.id._file_path);
             editor.putString(String.valueOf(i), songPath.getText().toString());
         }
+        editor.putInt("playlistSize", playlistSize);
         editor.apply();
 
-        log2me("onLoadFinished()", "load finished with Cursor data loaded : " + data.toString());
+        log2me("onLoadFinished()", "load finished with Cursor data loaded with : " + playlistSize + " songs");
     }
 
     @Override

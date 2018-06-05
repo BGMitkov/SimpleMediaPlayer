@@ -24,15 +24,17 @@ final class BackgroundMediaPlayer extends MediaPlayer {
     public static final String LAST_SONG = "lastSong";
     public static final String LAST_POSITION = "lastPosition";
     public static final int NOTIFICATION_ID = 0;
-    private static final String _LOG_TAG = "=-= BackgroundMediaPlayer";
     public static final String SAFE_STATE = "safeState()";
     public static final String CALLED = "Called";
     public static final String IS_PAUSED = "isPaused";
+    public static final String PLAY_NEXT_SONG = "playNextSong()";
+    private static final String _LOG_TAG = "=-= BackgroundMediaPlayer";
     private SharedPreferences prefs;
     private Context context;
     private NotificationCompat.Builder notificationBuilder;
 
     BackgroundMediaPlayer(Context context) {
+        log2me("BackgroundMediaPlayer()", CALLED);
         this.context = context;
         prefs = context.getSharedPreferences(PLAYLIST, Context.MODE_PRIVATE);
         notificationBuilder = new NotificationCompat.Builder(context)
@@ -55,7 +57,9 @@ final class BackgroundMediaPlayer extends MediaPlayer {
     }
 
     public void playNextSong(int nextSong, int from) {
+        log2me(PLAY_NEXT_SONG, CALLED);
         int playlistSize = prefs.getInt(PLAYLIST_SIZE, 0);
+        log2me(PLAY_NEXT_SONG, "Playlist size = " + playlistSize);
         if (playlistSize == 0) {
             return;
         }
@@ -76,22 +80,50 @@ final class BackgroundMediaPlayer extends MediaPlayer {
         }
 
         Uri songUri = Uri.fromFile(songFile);
-
+        log2me(PLAY_NEXT_SONG, "reset()");
         reset();
         try {
+            log2me(PLAY_NEXT_SONG, "setDataSource()");
             setDataSource(context, songUri);
-            prepare();
-            start();
-            setCurrentSongIndex(songToPlay);
-            seekTo(from);
-            setNotification(songFile.getName());
         } catch (IOException e) {
-            log2me("playNextSong()", "IOException setting datasource: " + songUri.toString());
+            log2me(PLAY_NEXT_SONG, "IOException occurred. setting datasource: " + songUri.toString() + "/n Message: " + e.getMessage());
+        } catch (IllegalStateException e) {
+            log2me(PLAY_NEXT_SONG, "IllegalStateException occurred. Media Player is wrong state. Message: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log2me(PLAY_NEXT_SONG, "IllegalArgumentException occurred. Setting up the data source. Message: " + e.getMessage());
+        } catch (SecurityException e) {
+            log2me(PLAY_NEXT_SONG, "SecurityException occurred. Message: " + e.getMessage());
         }
+
+        try {
+            log2me(PLAY_NEXT_SONG, "prepare()");
+            prepare();
+        } catch (IOException e) {
+            log2me(PLAY_NEXT_SONG, "IOException occurred. Preparing media player. Message: " + e.getMessage());
+        } catch (IllegalStateException e) {
+            log2me(PLAY_NEXT_SONG, "IllegalStateException occurred. Preparing media player. Message: " + e.getMessage());
+        }
+
+        try {
+            log2me(PLAY_NEXT_SONG, "start()");
+            start();
+        } catch (IllegalStateException e) {
+            log2me(PLAY_NEXT_SONG, "IllegalStateException occurred. Starting media player. Message: " + e.getMessage());
+        }
+        setCurrentSongIndex(songToPlay);
+        try {
+            log2me(PLAY_NEXT_SONG, "seekTo()");
+            seekTo(from);
+        } catch (IllegalStateException e) {
+            log2me(PLAY_NEXT_SONG, "IllegalStateException occurred. SeekTo media player. The internal player engine has not been initialized. Message: " + e.getMessage());
+        }
+
+        log2me(PLAY_NEXT_SONG, "setNotification()");
+        setNotification(songFile.getName());
     }
 
     public void restartIfNotPaused() {
-        if(!prefs.getBoolean(IS_PAUSED, false)) {
+        if (!prefs.getBoolean(IS_PAUSED, false)) {
             int lastSong = prefs.getInt(LAST_SONG, 0);
             int lastPosition = prefs.getInt(LAST_POSITION, 0);
             playNextSong(lastSong, lastPosition);
@@ -123,7 +155,7 @@ final class BackgroundMediaPlayer extends MediaPlayer {
     }
 
     public boolean startIfPaused() {
-        if(prefs.getBoolean(IS_PAUSED, false)) {
+        if (prefs.getBoolean(IS_PAUSED, false)) {
             int lastSong = prefs.getInt(LAST_SONG, 0);
             int lastPosition = prefs.getInt(LAST_POSITION, 0);
             playNextSong(lastSong, lastPosition);

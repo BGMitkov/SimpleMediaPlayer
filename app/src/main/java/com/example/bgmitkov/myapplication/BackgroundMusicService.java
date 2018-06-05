@@ -24,6 +24,7 @@ final public class BackgroundMusicService extends Service {
     public static final int NOTIFICATION_ID = 0;
     public static final String ON_DESTROY = "onDestroy()";
     private static final String _LOG_TAG = "=-= BackgroundMusicService";
+    public static final String ON_CREATE = "onCreate";
     private BackgroundMediaPlayer mediaPlayer;
 
     @Nullable
@@ -34,6 +35,7 @@ final public class BackgroundMusicService extends Service {
 
     @Override
     public void onCreate() {
+        log2me(ON_CREATE, CALLED);
         super.onCreate();
         mediaPlayer = new BackgroundMediaPlayer(this);
         mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
@@ -44,6 +46,7 @@ final public class BackgroundMusicService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        log2me(ON_START_COMMAND, CALLED);
         String action = null;
 
         if (intent != null) {
