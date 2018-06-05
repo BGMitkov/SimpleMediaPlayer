@@ -1,6 +1,8 @@
 package com.example.bgmitkov.myapplication;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.View;
@@ -16,25 +18,23 @@ import java.io.IOException;
  */
 
 public class OnCompleteListener implements MediaPlayer.OnCompletionListener {
+    private Context context;
+
+    OnCompleteListener(Context context) {
+        this.context = context;
+    }
     @Override
     public void onCompletion(MediaPlayer mp) {
-        MyMediaPlayer mmp = (MyMediaPlayer) mp;
-        mmp.reset();
-        ListView listView = mmp.getListView();
-        ListAdapter listAdapter = listView.getAdapter();
-
-        File file;
-        View nextView;
-        String filePath;
-        int nextSongPosition = mmp.getLastPosition();
-
-        boolean exists;
+        BackgroundMediaPlayer player = (BackgroundMediaPlayer) mp;
+        int nextSong = player.getCurrentSongIndex() + 1;
+        player.playNextSong(nextSong, 0);
+        /*boolean exists;
         do {
-            nextSongPosition += 1;
-            if(nextSongPosition >= listAdapter.getCount()) {
-                nextSongPosition = 0;
+            nextSong += 1;
+            if(nextSong >= listAdapter.getCount()) {
+                nextSong = 0;
             }
-            nextView = listAdapter.getView(nextSongPosition,null,listView);
+            nextView = listAdapter.getView(nextSong,null,listView);
             TextView path = (TextView) nextView.findViewById(R.id._file_path);
             filePath = path.getText().toString();
             file = new File(filePath);
@@ -42,25 +42,26 @@ public class OnCompleteListener implements MediaPlayer.OnCompletionListener {
             if(!exists) {
                 new AlertDialog.Builder(listView.getContext()).setMessage("Song file is missing: " + filePath).show();
             }
-        } while(!exists);
+        } while(!exists);*/
 
-        listView.smoothScrollToPositionFromTop(nextSongPosition, 0);
+        /*listView.smoothScrollToPositionFromTop(nextSong, 0);*/
 
-        TextView name = (TextView) nextView.findViewById(R.id._display_name);
-        TextView runningSongHolder = mmp.getNameHolder();
+        /*TextView name = (TextView) nextView.findViewById(R.id._display_name);
+        TextView runningSongHolder = player.getNameHolder();
         Uri myUri = Uri.fromFile(file);
         try{
-            mmp.setDataSource(listView.getContext(), myUri);
-            mmp.prepare();
-            mmp.start();
+            player.setDataSource(listView.getContext(), myUri);
+            player.prepare();
+            player.start();
             runningSongHolder.setText(name.getText().toString());
-            mmp.setLastPosition(nextSongPosition);
+            player.setLastPosition(nextSong);
         } catch (IOException e) {
             System.out.println(filePath);
             e.printStackTrace();
         } catch (IllegalStateException e) {
             System.out.println("wrong state");
             e.printStackTrace();
-        }
+        }*/
+
     }
 }

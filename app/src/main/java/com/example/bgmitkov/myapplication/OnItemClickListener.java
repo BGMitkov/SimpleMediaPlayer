@@ -1,15 +1,11 @@
 package com.example.bgmitkov.myapplication;
 
-import android.app.AlertDialog;
-import android.net.Uri;
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.TextView;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Created by bgmitkov on 19.5.2018 г..
@@ -17,40 +13,21 @@ import java.io.IOException;
 
 final class OnItemClickListener implements AdapterView.OnItemClickListener {
 
-    public static final String TAG = "=-= MainActivity";
-    MyMediaPlayer mediaPlayer;
-
-    OnItemClickListener(MyMediaPlayer mediaPlayer) {
-        this.mediaPlayer = mediaPlayer;
-    }
+    public static final String _LOG_TAG = "=-= OnItemClickListener";
+    public static final String ON_ITEM_CLICK = "onItemClick()";
+    public static final String CALLED = "Called";
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        mediaPlayer.reset();
-        ListView listView = mediaPlayer.getListView();
-        TextView path = (TextView) view.findViewById(R.id._file_path);
-        String filePath = path.getText().toString();
-        File file = new File(filePath);
-
-        if(!file.exists()) {
-            new AlertDialog.Builder(listView.getContext()).setMessage("Song file is missing!").show();
-            return;
-        }
-
-        TextView name = (TextView) view.findViewById(R.id._display_name);
-        Uri myUri = Uri.fromFile(file);
-        TextView runningSongHolder = mediaPlayer.getNameHolder();
-        try{
-            mediaPlayer.setDataSource(parent.getContext(), myUri);
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-            runningSongHolder.setText(name.getText().toString());
-            mediaPlayer.setLastPosition(position);
-            mediaPlayer.seekTo(mediaPlayer.getDuration() - 5000);
-        } catch (IOException e) {
-            Log.d(TAG, "onItemClick(): IOException occured for file: " + filePath);
-        } catch (IllegalStateException e) {
-            Log.d(TAG, "onItemClick():Media Player is in unexpected state!");
-        }
+        Context context = parent.getContext();
+        Intent backgroundMusicService = new Intent(BackgroundMusicService.ACTION_PLAY_SONG, null, context, BackgroundMusicService.class);
+        backgroundMusicService.putExtra(BackgroundMusicService.NEXT_SONG, position);
+        context.startService(backgroundMusicService);
+        log2me(ON_ITEM_CLICK, CALLED);
     }
+
+    public void log2me(String where, String what) {
+        Log.v(_LOG_TAG + "." + where, what);
+    }
+
 }

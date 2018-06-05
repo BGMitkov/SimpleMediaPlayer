@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -39,6 +40,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.bgmitkov.myapplication.MainActivity"/>
         </activity>
+        <service android:name="com.example.bgmitkov.myapplication.BackgroundMusicService"
+            android:permission="android.permission.READ_EXTERNAL_STORAGE"
+            android:process=":backgroundMediaPlayerProcess"
+            android:exported="false">
+        </service>
+
     </application>
 
 </manifest>

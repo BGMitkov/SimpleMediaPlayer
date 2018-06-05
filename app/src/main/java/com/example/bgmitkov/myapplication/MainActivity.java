@@ -1,11 +1,9 @@
 package com.example.bgmitkov.myapplication;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,7 +18,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -56,13 +53,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public static final String ON_LOADER_RESET = "onLoaderReset()";
     public static final String DOWNLOAD_SONGS_ACTIVITY = "_download_songs_activity";
     public static final int DOWNLOAD_MUSIC_REQUEST_CODE = 2;
-    static MyMediaPlayer mediaPlayer;
 
     ListView listView;
     MyListAdapter cursorAdapter;
     ListView genreList;
     GenreListAdapter genreListAdapter;
-    Button pauseButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,12 +68,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setSupportActionBar(myToolbar);
 
         listView = (ListView) findViewById(R.id._list_view);
-        TextView runningSongHolder = (TextView) findViewById(R.id._text_view);
-        pauseButton = (Button) findViewById(R.id._pause_button);
-        mediaPlayer = new MyMediaPlayer(listView, runningSongHolder);
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setOnErrorListener(new OnErrorListener());
-        mediaPlayer.setOnCompletionListener(new OnCompleteListener());
 
         genreList = new ListView(this);
         genreListAdapter = new GenreListAdapter(this, null);
@@ -86,11 +75,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         cursorAdapter = new MyListAdapter(this, null);
         listView.setAdapter(cursorAdapter);
-        listView.setOnItemClickListener(new OnItemClickListener(mediaPlayer));
-        mediaPlayer.setListView(listView);
+        listView.setOnItemClickListener(new OnItemClickListener());
 
         getSupportLoaderManager().initLoader(EXTERNAL_STORAGE_GENRE_LOADER_ID, null, this);
-
         log2me(ON_CREATE, FINISHED);
     }
 
@@ -233,14 +220,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     public void _pause_player(View view) {
-        if(mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-            pauseButton.setText(" |> ");
-        } else if(!cursorAdapter.isEmpty()){
-            mediaPlayer.start();
-            pauseButton.setText(" || ");
-        } else {
-            new AlertDialog.Builder(this).setMessage("No music to play").show();
-        }
+        Intent backgroundMusicService = new Intent(BackgroundMusicService.ACTION_PAUSE_OR_RESUME, null, this, BackgroundMusicService.class);
+        startService(backgroundMusicService);
+    }
+
+    public void _stop_player(View view) {
+        Intent backgroundMusicService = new Intent(this, BackgroundMusicService.class);
+        stopService(backgroundMusicService);
     }
 }

@@ -7,6 +7,6 @@
         app:showAsAction="never"/>
     <item android:id="@+id/action_download_songs"
         android:title="@string/action_download_songs"
-        android:icon="@drawable/ic_action_download_activity"
+        android:icon="@drawable/baseline_cloud_download_24"
         app:showAsAction="ifRoom"/>
 </menu>

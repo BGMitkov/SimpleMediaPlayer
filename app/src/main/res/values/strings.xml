@@ -2,7 +2,6 @@
     <string name="app_name">My Application</string>
     <string name="load_button_text">Load Songs</string>
     <string name="download_button">Download Songs</string>
-    <string name="running_song_holder_text">No Song running!</string>
     <string name="title_activity_settings">Settings</string>
     <string name="settings_button_text">Settings</string>
     <string name="preference_file_key">com.example.bgmitkov.myapplication.PREFERENCE_FILE_KEY</string>
@@ -10,6 +9,4 @@
     <string name="action_download_songs">Download Songs</string>
     <string name="example_link">http://m.yaht.net/repo/muzic/</string>
     <string name="_display_songs_button">GET</string>
-    <string name="pause_button_text"> |> </string>
-
 </resources>

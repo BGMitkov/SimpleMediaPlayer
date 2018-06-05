@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 public class DownloadMusicActivity extends AppCompatActivity {
-    private static final String _LOG_TAG = "=-= MainActivity";
+    private static final String _LOG_TAG = "=-= DownloadMusicActivity";
     ListView listView;
 
     @Override
@@ -25,6 +25,7 @@ public class DownloadMusicActivity extends AppCompatActivity {
         }
         listView = (ListView) findViewById(R.id._browsing_music_list);
         listView.setOnItemClickListener(new DownloadSongOnClickListener());
+        log2me("onCreate", "Called");
     }
 
     public void _display_songs(View view) {
