@@ -46,7 +46,6 @@ final class AsyncDownloadSong extends AsyncTask<String, Integer, String> {
 
     @Override
     protected String doInBackground(String... params) {
-
         HttpURLConnection httpURLConnection = null;
         InputStream is = null;
         OutputStream out = null;
